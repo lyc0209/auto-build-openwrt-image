@@ -1,0 +1,45 @@
+name: OpenWrt-CI
+
+on:
+  # 允许手动运行
+  workflow_dispatch:
+  schedule:
+    - cron: 0 10 * * 5
+
+jobs:
+
+  build_openwrt:
+
+    name: Build OpenWrt img
+
+    runs-on: ubuntu-latest
+    
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+
+        - name: Package Armvirt as OpenWrt
+          uses: unifreq/openwrt_packit@master
+          env:
+            OPENWRT_ARMVIRT: https://github.com/lyc0209/lede/releases/download/20220505/openwrt-armvirt-64-default-rootfs.tar.gz
+            PACKAGE_SOC: s905d
+            KERNEL_VERSION_NAME: 5.17.5
+            KERNEL_AUTO_LATEST: true
+            WHOAMI: GoldenLee
+          run: |
+            ./openwrt_flippy.sh
+            
+            
+        - name: Upload OpenWrt Firmware to Release
+          uses: ncipollo/release-action@v1
+          with:
+            tag: openwrt_armvirt_v8_${{ env.PACKAGED_OUTPUTDATE }}
+            artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+            allowUpdates: true
+            token: ${{ secrets.GITHUB_TOKEN }}
+            body: |
+              This is OpenWrt firmware for Armvirt 64
+              * Firmware information
+              Default IP: 192.168.1.1
+              Default username: root
+              Default password: password
