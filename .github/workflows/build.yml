@@ -49,6 +49,7 @@ jobs:
           src-git small https://github.com/kenzok8/small
           EOF
           
+          cp ../s905d_n1.conf ./
 
       - name: Update feeds
         run: |
