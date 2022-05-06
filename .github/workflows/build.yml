@@ -1,14 +1,6 @@
-# 
-# <https://github.com/KFERMercer/OpenWrt-CI>
-#
-# Copyright (C) 2019 P3TERX
-#
-# Copyright (C) 2020 KFERMercer
-#
 name: OpenWrt-CI
 
 on:
-  # 允许手动运行
   workflow_dispatch:
   schedule:
     - cron: 20 5 * * 5
@@ -43,7 +35,7 @@ jobs:
 
           df -h
       
-      -name: init Lede
+      - name: init Lede
         run: |
           git clone https://github.com/coolsnowwolf/lede.git
           cd lede
@@ -65,15 +57,7 @@ jobs:
           rm -f ./.config*
           touch ./.config
 
-          #
-          # 在 cat >> .config <<EOF 到 EOF 之间粘贴你的编译配置, 需注意缩进关系
-          # 例如:
-            
           cat ./s905d_n1.conf > ./.config
-
-          #
-          # ===============================================================
-          # 
 
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
@@ -121,17 +105,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: OpenWrt_firmware
-          path: ./bin/targets/
-  
-      # - name: Upload release asset
-      #   if: github.event == 'release'
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.YOURTOKEN }}
-      #     file: ./artifact/firmware/*
-      #     tag: ${{ github.ref }}
-      #     file_glob: true
-      
+          path: ./bin/targets/      
       
       - name: Package Armvirt as OpenWrt
         uses: unifreq/openwrt_packit@master
